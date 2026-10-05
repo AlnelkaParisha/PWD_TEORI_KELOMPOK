@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pendaftaran Workshop Web Programming</title>
+<style>
+  :root {
+    --wine: #4a0a22;
+    --maroon: #7a1237;
+    --berry: #b3205a;
+    --pink: #ec5b8c;
+    --blush: #fde8f0;
+    --petal: #f8c9da;
+    --ink: #2b0a17;
+    --muted: #7d5565;
+    --paper: #ffffff;
+    --line: #efd3de;
+    --ok: #168a5b;
+    --ok-bg: #e4f6ed;
+    --err: #d11a2a;
+    --err-bg: #fff2ef;
+    --grad: linear-gradient(135deg, var(--maroon), var(--berry) 55%, var(--pink));
+    --font: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    font-family: var(--font);
+    color: var(--ink);
+    line-height: 1.5;
+    background:
+      radial-gradient(900px 500px at 8% -10%, #f6b4cb55, transparent 60%),
+      radial-gradient(800px 500px at 100% 100%, #d9467f33, transparent 60%),
+      var(--blush);
+    background-attachment: fixed;
+  }
+  .page {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 44px 20px 64px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .page { grid-template-columns: 1fr; gap: 24px; padding-top: 20px; }
+  }
+
+  /* ---------- Kartu info (kiri) ---------- */
+  .intro {
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    background: var(--grad);
+    border-radius: 24px;
+    padding: 36px 32px 32px;
+    box-shadow: 0 24px 48px -24px rgba(122, 18, 55, .65);
+  }
+  .intro::before, .intro::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .intro::before {
+    width: 280px; height: 280px;
+    right: -90px; top: -90px;
+    background: radial-gradient(circle, #ffffff40, transparent 70%);
+  }
+  .intro::after {
+    width: 220px; height: 220px;
+    left: -80px; bottom: -80px;
+    background: radial-gradient(circle, #4a0a2299, transparent 70%);
+  }
+  .intro > * { position: relative; z-index: 1; }
+  .code-chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: .85rem;
+    background: #ffffff26;
+    border: 1px solid #ffffff55;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .intro h1 {
+    font-size: clamp(2rem, 4.5vw, 2.9rem);
+    line-height: 1.08;
+    margin: 0 0 14px;
+    letter-spacing: -0.02em;
+  }
+  .intro p { color: #ffe9f1; max-width: 42ch; margin: 0 0 26px; }
+  .facts { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff1c;
+    border: 1px solid #ffffff3a;
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .facts .ico {
+    flex: none;
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    font-size: 1.2rem;
+    background: #ffffff2e;
+    border-radius: 12px;
+  }
+  .facts b { display: block; font-size: .95rem; }
+  .facts span { color: #ffdbe8; font-size: .88rem; }
+
+  /* ---------- Form ---------- */
+  .panel {
+    position: relative;
+    background: var(--paper);
+    border-radius: 24px;
+    padding: 34px 30px 30px;
+    box-shadow: 0 24px 48px -28px rgba(122, 18, 55, .5);
+    overflow: hidden;
+  }
+  .panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 6px;
+    background: var(--grad);
+  }
+  .panel h2 { margin: 0 0 4px; font-size: 1.4rem; color: var(--maroon); }
+  .panel .hint { margin: 0 0 22px; color: var(--muted); font-size: .92rem; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-weight: 600; margin-bottom: 6px; font-size: .95rem; color: var(--wine); }
+  .field input, .field select {
+    width: 100%;
+    font: inherit;
+    padding: 12px 14px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: #fffafc;
+    color: var(--ink);
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  .field input::placeholder { color: #b995a5; }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--berry);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(236, 91, 140, .22);
+  }
+  .field.invalid input, .field.invalid select { border-color: var(--err); background: var(--err-bg); }
+  .field.valid input, .field.valid select { border-color: var(--ok); background: #fff; }
+  .error-msg {
+    display: none;
+    margin: 7px 0 0;
+    color: var(--err);
+    font-size: .88rem;
+    font-weight: 600;
+  }
+  .error-msg::before { content: "⚠ "; }
+  .field.invalid .error-msg { display: block; }
+
+  .error-summary {
+    display: none;
+    background: var(--err-bg);
+    border-left: 5px solid var(--err);
+    color: var(--err);
+    padding: 11px 14px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    font-size: .92rem;
+    font-weight: 600;
+  }
+  .error-summary.show { display: block; }
+
+  .btn {
+    font: inherit;
+    font-weight: 700;
+    border: 0;
+    border-radius: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    background: var(--grad);
+    background-size: 160% 100%;
+    background-position: 0 0;
+    color: #fff;
+    width: 100%;
+    box-shadow: 0 10px 20px -10px rgba(179, 32, 90, .8);
+    transition: background-position .3s, transform .15s, box-shadow .15s;
+  }
+  .btn:hover { background-position: 100% 0; transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 3px solid var(--wine); outline-offset: 3px; }
+  .btn.ghost {
+    background: transparent;
+    color: var(--maroon);
+    border: 2px solid var(--maroon);
+    box-shadow: none;
+  }
+  .btn.ghost:hover { background: var(--maroon); color: #fff; }
+
+  /* ---------- Kartu konfirmasi ---------- */
+  #hasil:empty { display: none; }
+  .ticket {
+    position: relative;
+    background: var(--paper);
+    border-radius: 24px;
+    box-shadow: 0 24px 48px -28px rgba(122, 18, 55, .6);
+    overflow: hidden;
+    animation: muncul .5s cubic-bezier(.2, .9, .3, 1.2);
+  }
+  @keyframes muncul {
+    from { transform: translateY(18px) scale(.96); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+  .ticket-head {
+    background: var(--grad);
+    color: #fff;
+    padding: 26px 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .check {
+    flex: none;
+    width: 52px; height: 52px;
+    display: grid; place-items: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: #fff;
+    color: var(--berry);
+    border-radius: 50%;
+  }
+  .ticket-head h2 { margin: 0 0 2px; font-size: 1.3rem; }
+  .ticket-head p { margin: 0; opacity: .95; font-size: .93rem; }
+  .ticket-body { padding: 22px 30px 8px; }
+  .row { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .row span { color: var(--muted); }
+  .row b { text-align: right; word-break: break-word; color: var(--wine); }
+  .ticket-foot {
+    position: relative;
+    margin: 14px 0 0;
+    padding: 22px 30px 28px;
+    border-top: 2px dashed var(--petal);
+    display: grid;
+    gap: 10px;
+  }
+  .ticket-foot::before, .ticket-foot::after {
+    content: "";
+    position: absolute;
+    top: -13px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--blush);
+  }
+  .ticket-foot::before { left: -12px; }
+  .ticket-foot::after { right: -12px; }
+  .reg-no {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-align: center;
+    background: var(--blush);
+    color: var(--maroon);
+    border: 2px dashed var(--pink);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .note { font-size: .85rem; color: var(--muted); margin: 0; text-align: center; }
+
+  /* ---------- Konfeti saat berhasil ---------- */
+  .confetti {
+    position: fixed;
+    top: -14px;
+    width: 10px; height: 14px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 50;
+    animation: jatuh linear forwards;
+  }
+  @keyframes jatuh {
+    to { transform: translateY(105vh) rotate(720deg); opacity: .8; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticket { animation: none; }
+    .confetti { display: none; }
+    .btn { transition: none; }
+  }
+  @media print {
+    body { background: #fff; }
+    .intro, #formPanel, .ticket-foot .btn, .confetti { display: none !important; }
+    .page { display: block; }
+    .ticket-foot::before, .ticket-foot::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+
+  <!-- Info workshop -->
+  <section class="intro">
+    <span class="code-chip">&lt;workshop /&gt;</span>
+    <h1>Workshop Web Programming</h1>
+    <p>Belajar membuat halaman web interaktif langsung dari nol. Isi formulir di samping, lalu simpan kartu konfirmasi pendaftaran Anda.</p>
+    <ul class="facts">
+      <li><div class="ico">💻</div><div><b>Materi</b><span>Selektor, event, manipulasi DOM, dan validasi form</span></div></li>
+      <li><div class="ico">📍</div><div><b>Tempat</b><span>Laboratorium Komputer Sekolah</span></div></li>
+      <li><div class="ico">🎓</div><div><b>Peserta</b><span>Siswa kelas X – XII</span></div></li>
+      <li><div class="ico">🎟️</div><div><b>Biaya</b><span>Gratis</span></div></li>
+    </ul>
+  </section>
+
+  <!-- Kolom kanan: form + kartu konfirmasi -->
+  <section>
+    <div class="panel" id="formPanel">
+      <h2>Formulir pendaftaran</h2>
+      <p class="hint">Semua kolom wajib diisi.</p>
+
+      <div class="error-summary" id="ringkasanError" role="alert"></div>
+
+      <form id="formDaftar" novalidate>
+        <div class="field">
+          <label for="nama">Nama lengkap</label>
+          <input type="text" id="nama" name="nama" placeholder="Contoh: Budi Santoso" autocomplete="name">
+          <p class="error-msg" id="err-nama"></p>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="budi@email.com" autocomplete="email">
+          <p class="error-msg" id="err-email"></p>
+        </div>
+
+        <div class="field">
+          <label for="hp">Nomor HP</label>
+          <input type="tel" id="hp" name="hp" placeholder="081234567890" inputmode="numeric" autocomplete="tel">
+          <p class="error-msg" id="err-hp"></p>
+        </div>
+
+        <div class="field">
+          <label for="sesi">Pilih sesi</label>
+          <select id="sesi" name="sesi">
+            <option value="">-- Pilih sesi --</option>
+            <option value="Sesi 1 – Pagi (08.00–10.00)">Sesi 1 – Pagi (08.00–10.00)</option>
+            <option value="Sesi 2 – Siang (10.30–12.30)">Sesi 2 – Siang (10.30–12.30)</option>
+            <option value="Sesi 3 – Sore (13.30–15.30)">Sesi 3 – Sore (13.30–15.30)</option>
+          </select>
+          <p class="error-msg" id="err-sesi"></p>
+        </div>
+
+        <button type="submit" class="btn">Daftar sekarang</button>
+      </form>
+    </div>
+
+    <!-- Kartu konfirmasi akan dibuat lewat jQuery di sini -->
+    <div id="hasil" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<!-- Library jQuery (CDN resmi) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$(document).ready(function () {
+
+  /* =====================================================
+     1. SELEKTOR jQuery – mengambil elemen dengan $("...")
+     ===================================================== */
+  var $form      = $("#formDaftar");
+  var $formPanel = $("#formPanel");
+  var $hasil     = $("#hasil");
+  var $ringkasan = $("#ringkasanError");
+  var $inputs    = $("#formDaftar input, #formDaftar select");
+
+  /* =====================================================
+     2. VALIDASI – satu fungsi untuk setiap kolom.
+        Mengembalikan teks error, atau "" jika valid.
+     ===================================================== */
+  var aturan = {
+    nama: function (v) {
+      v = $.trim(v);
+      if (v === "") return "Nama wajib diisi.";
+      if (v.length < 3) return "Nama minimal 3 karakter.";
+      if (!/^[A-Za-z\s.'-]+$/.test(v)) return "Nama hanya boleh berisi huruf, spasi, titik, atau tanda hubung.";
+      return "";
+    },
+    email: function (v) {
+      v = $.trim(v);
+      if (v === "") return "Email wajib diisi.";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return "Format email tidak valid. Contoh: nama@email.com";
+      return "";
+    },
+    hp: function (v) {
+      v = $.trim(v);
+      if (v === "") return "Nomor HP wajib diisi.";
+      if (!/^\d+$/.test(v.replace(/^\+/, ""))) return "Nomor HP hanya boleh berisi angka.";
+      if (!/^(08|\+?628)/.test(v)) return "Nomor HP harus diawali 08 atau +62.";
+      var digit = v.replace(/\D/g, "");
+      if (digit.length < 10 || digit.length > 14) return "Nomor HP harus 10–14 digit.";
+      return "";
+    },
+    sesi: function (v) {
+      if (v === "") return "Silakan pilih salah satu sesi.";
+      return "";
+    }
+  };
+
+  /* =====================================================
+     3. MANIPULASI DOM – tampilkan / hapus pesan error
+     ===================================================== */
+  function validasiField(el) {
+    var $el     = $(el);
+    var nama    = $el.attr("name");
+    var pesan   = aturan[nama]($el.val());
+    var $wrapper = $el.closest(".field");
+
+    $("#err-" + nama).text(pesan);                      // isi teks error
+    $wrapper.toggleClass("invalid", pesan !== "");      // merah jika salah
+    $wrapper.toggleClass("valid", pesan === "");        // hijau jika benar
+    $el.attr("aria-invalid", pesan !== "");
+    return pesan;
+  }
+
+  /* =====================================================
+     4. EVENT jQuery – blur, input, change, submit, click
+     ===================================================== */
+  // Cek saat pengguna selesai mengisi kolom
+  $inputs.on("blur", function () {
+    validasiField(this);
+  });
+
+  // Jika sudah ditandai salah, perbarui langsung saat mengetik
+  $inputs.on("input", function () {
+    if ($(this).closest(".field").hasClass("invalid")) validasiField(this);
+  });
+
+  $inputs.on("change", function () {
+    validasiField(this);
+  });
+
+  $form.on("submit", function (e) {
+    e.preventDefault(); // cegah reload halaman
+
+    var jumlahError = 0;
+    var $kolomPertamaSalah = null;
+
+    $inputs.each(function () {
+      if (validasiField(this) !== "") {
+        jumlahError++;
+        if (!$kolomPertamaSalah) $kolomPertamaSalah = $(this);
+      }
+    });
+
+    if (jumlahError > 0) {
+      $ringkasan
+        .text("Ada " + jumlahError + " kolom yang perlu diperbaiki sebelum mendaftar.")
+        .addClass("show");
+      $kolomPertamaSalah.trigger("focus");
+      return;
+    }
+
+    $ringkasan.removeClass("show");
+    tampilkanKartu({
+      nama:  $.trim($("#nama").val()),
+      email: $.trim($("#email").val()),
+      hp:    $.trim($("#hp").val()),
+      sesi:  $("#sesi").val()
+    });
+  });
+
+  /* =====================================================
+     5. MANIPULASI DOM – membuat kartu konfirmasi
+     ===================================================== */
+  function buatNomor() {
+    var acak = Math.floor(1000 + Math.random() * 9000);
+    return "WWP-2026-" + acak;
+  }
+
+  function buatBaris(label, nilai) {
+    var $baris = $("<div>", { "class": "row" });
+    $("<span>").text(label).appendTo($baris);
+    $("<b>").text(nilai).appendTo($baris); // .text() = aman dari injeksi HTML
+    return $baris;
+  }
+
+  // Konfeti: elemen dibuat lewat jQuery lalu dihapus setelah animasi selesai
+  function hujanKonfeti() {
+    var warna = ["#7a1237", "#b3205a", "#ec5b8c", "#f8c9da", "#4a0a22"];
+    for (var i = 0; i < 46; i++) {
+      var $c = $("<span>", { "class": "confetti" }).css({
+        left: Math.random() * 100 + "vw",
+        background: warna[i % warna.length],
+        animationDuration: (2 + Math.random() * 2) + "s",
+        animationDelay: (Math.random() * 0.6) + "s"
+      });
+      $("body").append($c);
+      setTimeout((function ($el) {
+        return function () { $el.remove(); };
+      })($c), 4500);
+    }
+  }
+
+  function tampilkanKartu(data) {
+    $hasil.empty();   // kosongkan kartu sebelumnya
+
+    var $kartu = $("<article>", { "class": "ticket" });
+
+    // Header
+    var $head = $("<div>", { "class": "ticket-head" }).html(
+      '<div class="check">✓</div><div><h2>Pendaftaran berhasil</h2>' +
+      '<p>Terima kasih, <span></span>. Anda sudah terdaftar.</p></div>'
+    );
+    $head.find("span").text(data.nama.split(" ")[0]);
+
+    // Isi data
+    var $body = $("<div>", { "class": "ticket-body" }).append(
+      buatBaris("Nama", data.nama),
+      buatBaris("Email", data.email),
+      buatBaris("No. HP", data.hp),
+      buatBaris("Sesi", data.sesi),
+      buatBaris("Acara", "Workshop Web Programming")
+    );
+
+    // Footer: nomor + tombol
+    var $foot = $("<div>", { "class": "ticket-foot" });
+
+    var $no = $("<div>", { "class": "reg-no" }).text(buatNomor());
+    var $catatan = $("<p>", { "class": "note" })
+      .text("Tunjukkan kartu ini saat registrasi ulang di lokasi.");
+
+    var $btnCetak = $("<button>", { type: "button", "class": "btn" })
+      .text("Cetak kartu")
+      .on("click", function () { window.print(); });
+
+    var $btnUlang = $("<button>", { type: "button", "class": "btn ghost" })
+      .text("Daftarkan peserta lain")
+      .on("click", resetHalaman);
+
+    $foot.append($no, $catatan, $btnCetak, $btnUlang);
+    $kartu.append($head, $body, $foot);
+    $hasil.append($kartu);
+
+    $formPanel.hide();   // sembunyikan form
+    $("html, body").animate({ scrollTop: $kartu.offset().top - 20 }, 400);
+    hujanKonfeti();
+  }
+
+  function resetHalaman() {
+    $hasil.empty();
+    $form[0].reset();
+    $(".field").removeClass("valid invalid");
+    $(".error-msg").text("");
+    $formPanel.show();
+    $("#nama").trigger("focus");
+  }
+
+});
+</script>
+</body>
+</html>
